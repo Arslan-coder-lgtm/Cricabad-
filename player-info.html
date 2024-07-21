@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Info</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            text-align: center;
+        }
+        #player-info {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #fff;
+        }
+        img {
+            max-width: 150px;
+            border-radius: 50%;
+        }
+        .stats {
+            text-align: left;
+            margin: 20px 0;
+        }
+        .stats table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .stats th, .stats td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        .stats th {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+    <div id="player-info">
+        <img id="player-img" src="" alt="Player Image">
+        <h1 id="player-name">Player Name</h1>
+        <p id="player-country">Country</p>
+        <p id="player-birthdate">Date of Birth</p>
+        <p id="player-role">Role</p>
+        <p id="player-batting-style">Batting Style</p>
+        <p id="player-bowling-style">Bowling Style</p>
+        <div class="stats">
+            <h2>Batting Stats</h2>
+            <table id="batting-stats">
+                <!-- Batting stats will be inserted here -->
+            </table>
+            <h2>Bowling Stats</h2>
+            <table id="bowling-stats">
+                <!-- Bowling stats will be inserted here -->
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = 'e02252ea-669b-4bef-bf77-6ff08c407fd6';
+        const playerId = 'a719e015-0604-4a04-9992-b43a986bae28'; // Update with actual player ID
+        const apiUrl = `https://api.cricapi.com/v1/player_info?apikey=${apiKey}&player_id=${playerId}`;
+
+        async function fetchPlayerInfo() {
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                const player = data.data;
+                
+                document.getElementById('player-img').src = player.playerImg;
+                document.getElementById('player-name').innerText = player.name;
+                document.getElementById('player-country').innerText = `Country: ${player.country}`;
+                document.getElementById('player-birthdate').innerText = `Date of Birth: ${player.dateOfBirth}`;
+                document.getElementById('player-role').innerText = `Role: ${player.role}`;
+                document.getElementById('player-batting-style').innerText = `Batting Style: ${player.battingStyle}`;
+                document.getElementById('player-bowling-style').innerText = `Bowling Style: ${player.bowlingStyle}`;
+
+                // Batting Stats
+                const battingStats = player.stats.filter(stat => stat.fn === 'batting');
+                const battingTable = document.getElementById('batting-stats');
+                battingTable.innerHTML = '<tr><th>Match Type</th><th>Stat</th><th>Value</th></tr>';
+                battingStats.forEach(stat => {
+                    battingTable.innerHTML += `<tr><td>${stat.matchtype}</td><td>${stat.stat}</td><td>${stat.value}</td></tr>`;
+                });
+
+                // Bowling Stats
+                const bowlingStats = player.stats.filter(stat => stat.fn === 'bowling');
+                const bowlingTable = document.getElementById('bowling-stats');
+                bowlingTable.innerHTML = '<tr><th>Match Type</th><th>Stat</th><th>Value</th></tr>';
+                bowlingStats.forEach(stat => {
+                    bowlingTable.innerHTML += `<tr><td>${stat.matchtype}</td><td>${stat.stat}</td><td>${stat.value}</td></tr>`;
+                });
+
+            } catch (error) {
+                console.error('Error fetching player info:', error);
+                document.getElementById('player-info').innerHTML = '<p>Error fetching player info.</p>';
+            }
+        }
+
+        // Fetch player info initially
+        fetchPlayerInfo();
+
+        // Fetch player info every 60 seconds
+        setInterval(fetchPlayerInfo, 60000);
