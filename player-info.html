@@ -62,8 +62,8 @@
     </div>
 
     <script>
-        const apiKey = 'e02252ea-669b-4bef-bf77-6ff08c407fd6';
-        const playerId = 'a719e015-0604-4a04-9992-b43a986bae28'; // Update with actual player ID
+        const apiKey = 'e02252ea-669b-4bef-bf77-6ff08c407fd6';  
+        const playerId = 'a719e015-0604-4a04-9992-b43a986bae28';  
         const apiUrl = `https://api.cricapi.com/v1/player_info?apikey=${apiKey}&player_id=${playerId}`;
 
         async function fetchPlayerInfo() {
@@ -71,31 +71,34 @@
                 const response = await fetch(apiUrl);
                 const data = await response.json();
                 const player = data.data;
-                
-                document.getElementById('player-img').src = player.playerImg;
-                document.getElementById('player-name').innerText = player.name;
-                document.getElementById('player-country').innerText = `Country: ${player.country}`;
-                document.getElementById('player-birthdate').innerText = `Date of Birth: ${player.dateOfBirth}`;
-                document.getElementById('player-role').innerText = `Role: ${player.role}`;
-                document.getElementById('player-batting-style').innerText = `Batting Style: ${player.battingStyle}`;
-                document.getElementById('player-bowling-style').innerText = `Bowling Style: ${player.bowlingStyle}`;
 
-                // Batting Stats
-                const battingStats = player.stats.filter(stat => stat.fn === 'batting');
-                const battingTable = document.getElementById('batting-stats');
-                battingTable.innerHTML = '<tr><th>Match Type</th><th>Stat</th><th>Value</th></tr>';
-                battingStats.forEach(stat => {
-                    battingTable.innerHTML += `<tr><td>${stat.matchtype}</td><td>${stat.stat}</td><td>${stat.value}</td></tr>`;
-                });
+                if (player) {
+                    document.getElementById('player-img').src = player.playerImg || '';
+                    document.getElementById('player-name').innerText = player.name || 'Player Name';
+                    document.getElementById('player-country').innerText = `Country: ${player.country || 'Country'}`;
+                    document.getElementById('player-birthdate').innerText = `Date of Birth: ${player.dateOfBirth || 'Date of Birth'}`;
+                    document.getElementById('player-role').innerText = `Role: ${player.role || 'Role'}`;
+                    document.getElementById('player-batting-style').innerText = `Batting Style: ${player.battingStyle || 'Batting Style'}`;
+                    document.getElementById('player-bowling-style').innerText = `Bowling Style: ${player.bowlingStyle || 'Bowling Style'}`;
 
-                // Bowling Stats
-                const bowlingStats = player.stats.filter(stat => stat.fn === 'bowling');
-                const bowlingTable = document.getElementById('bowling-stats');
-                bowlingTable.innerHTML = '<tr><th>Match Type</th><th>Stat</th><th>Value</th></tr>';
-                bowlingStats.forEach(stat => {
-                    bowlingTable.innerHTML += `<tr><td>${stat.matchtype}</td><td>${stat.stat}</td><td>${stat.value}</td></tr>`;
-                });
+                    // Batting Stats
+                    const battingStats = player.stats.filter(stat => stat.fn === 'batting');
+                    const battingTable = document.getElementById('batting-stats');
+                    battingTable.innerHTML = '<tr><th>Match Type</th><th>Stat</th><th>Value</th></tr>';
+                    battingStats.forEach(stat => {
+                        battingTable.innerHTML += `<tr><td>${stat.matchtype}</td><td>${stat.stat}</td><td>${stat.value}</td></tr>`;
+                    });
 
+                    // Bowling Stats
+                    const bowlingStats = player.stats.filter(stat => stat.fn === 'bowling');
+                    const bowlingTable = document.getElementById('bowling-stats');
+                    bowlingTable.innerHTML = '<tr><th>Match Type</th><th>Stat</th><th>Value</th></tr>';
+                    bowlingStats.forEach(stat => {
+                        bowlingTable.innerHTML += `<tr><td>${stat.matchtype}</td><td>${stat.stat}</td><td>${stat.value}</td></tr>`;
+                    });
+                } else {
+                    document.getElementById('player-info').innerHTML = '<p>No player data available.</p>';
+                }
             } catch (error) {
                 console.error('Error fetching player info:', error);
                 document.getElementById('player-info').innerHTML = '<p>Error fetching player info.</p>';
@@ -107,3 +110,6 @@
 
         // Fetch player info every 60 seconds
         setInterval(fetchPlayerInfo, 60000);
+    </script>
+</body>
+</html>
