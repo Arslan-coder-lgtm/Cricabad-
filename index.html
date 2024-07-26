@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Cricket Score</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+        }
+        #scoreboard {
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Live Cricket Score</h1>
+    <div id="scoreboard">Loading...</div>
+
+    <script>
+        const apiKey = 'e02252ea-669b-4bef-bf77-6ff08c407fd6';
+        const matchId = 'abb45740-94e2-4743-8430-4777ca5ab0ad'; // Updated match ID
+        const apiUrl = `https://api.cricapi.com/v1/match_info?apikey=${apiKey}&id=${matchId}`;
+
+        async function fetchScore() {
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                const match = data.data;
+
+                if (match) {
+                    const scoreText = `
+                        ${match.teamInfo[0]?.name || 'Team 1'} vs ${match.teamInfo[1]?.name || 'Team 2'}<br>
+                        ${match.score[0]?.inning || 'Inning 1'}: ${match.score[0]?.r || '0'}/${match.score[0]?.w || '0'} (${match.score[0]?.o || '0'} overs)<br>
+                        ${match.score[1]?.inning || 'Inning 2'}: ${match.score[1]?.r || '0'}/${match.score[1]?.w || '0'} (${match.score[1]?.o || '0'} overs)
+                    `;
+                    document.getElementById('scoreboard').innerHTML = scoreText;
+                } else {
+                    document.getElementById('scoreboard').innerText = 'Score not available';
+                }
+            } catch (error) {
+                console.error('Error fetching score:', error);
+                document.getElementById('scoreboard').innerText = 'Error fetching score';
+            }
+        }
+
+        // Fetch score initially
+        fetchScore();
+
+        // Fetch score every 60 seconds
+        setInterval(fetchScore, 60000);
+    </script>
+</body>
+</html>
