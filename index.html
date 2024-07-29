@@ -68,9 +68,10 @@
             try {
                 const response = await fetch(matchUrl);
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    throw new Error(`Network response was not ok: ${response.statusText}`);
                 }
                 const data = await response.json();
+                console.log(data); // Log the data for debugging
 
                 if (!data || !data.data) {
                     throw new Error('Invalid data');
