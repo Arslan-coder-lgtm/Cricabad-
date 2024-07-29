@@ -7,12 +7,27 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #000;
-            color: #fff;
+            background-color: #f4f4f4;
+            color: #333;
             text-align: center;
         }
         #scoreboard {
-            font-size: 1.5em;
+            margin-top: 20px;
+        }
+        .player {
+            display: inline-block;
+            width: 200px;
+            margin: 10px;
+        }
+        .player img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+        }
+        .details {
+            margin-top: 20px;
+        }
+        .match-info, .player-stats {
             margin-top: 20px;
         }
     </style>
@@ -20,40 +35,84 @@
 <body>
     <h1>Live Cricket Score</h1>
     <div id="scoreboard">Loading...</div>
+    <div class="details">
+        <div class="player" id="batsman1">
+            <img src="default-img.png" alt="Batsman 1" id="batsman1Img">
+            <p id="batsman1Name">Batsman 1</p>
+            <p id="batsman1Score">Score</p>
+        </div>
+        <div class="player" id="batsman2">
+            <img src="default-img.png" alt="Batsman 2" id="batsman2Img">
+            <p id="batsman2Name">Batsman 2</p>
+            <p id="batsman2Score">Score</p>
+        </div>
+        <div class="player" id="bowler">
+            <img src="default-img.png" alt="Bowler" id="bowlerImg">
+            <p id="bowlerName">Bowler</p>
+            <p id="bowlerStats">Stats</p>
+        </div>
+    </div>
+    <div class="match-info">
+        <p id="runRate">Run Rate: </p>
+        <p id="requiredRunRate">Required Run Rate: </p>
+        <p id="ballsLeft">Balls Left: </p>
+        <p id="runsNeeded">Runs Needed: </p>
+    </div>
 
     <script>
         const apiKey = 'e02252ea-669b-4bef-bf77-6ff08c407fd6';
-        const matchId = '            "id": "82286419-df83-4a21-9155-9a8c7cd0cc1a",
-'; // Updated match ID
-        const apiUrl = `https://api.cricapi.com/v1/match_info?apikey=${apiKey}&id=${matchId}`;
+        const matchId = '82286419-df83-4a21-9155-9a8c7cd0cc1a';
+        const matchUrl = `https://api.cricapi.com/v1/matches/${matchId}?apikey=${apiKey}`;
 
-        async function fetchScore() {
+        async function fetchMatchData() {
             try {
-                const response = await fetch(apiUrl);
-                const data = await response.json();
-                const match = data.data;
-
-                if (match) {
-                    const scoreText = `
-                        ${match.teamInfo[0]?.name || 'Team 1'} vs ${match.teamInfo[1]?.name || 'Team 2'}<br>
-                        ${match.score[0]?.inning || 'Inning 1'}: ${match.score[0]?.r || '0'}/${match.score[0]?.w || '0'} (${match.score[0]?.o || '0'} overs)<br>
-                        ${match.score[1]?.inning || 'Inning 2'}: ${match.score[1]?.r || '0'}/${match.score[1]?.w || '0'} (${match.score[1]?.o || '0'} overs)
-                    `;
-                    document.getElementById('scoreboard').innerHTML = scoreText;
-                } else {
-                    document.getElementById('scoreboard').innerText = 'Score not available';
+                const response = await fetch(matchUrl);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
                 }
+                const data = await response.json();
+
+                if (!data || !data.data) {
+                    throw new Error('Invalid data');
+                }
+
+                const matchData = data.data;
+                const battingTeam = matchData.currentBattingTeam; // Adjust based on API response
+                const batsman1 = battingTeam.batsmen[0]; // Adjust based on API response
+                const batsman2 = battingTeam.batsmen[1]; // Adjust based on API response
+                const bowler = matchData.currentBowler; // Adjust based on API response
+
+                document.getElementById('scoreboard').innerText = `${matchData.score}`;
+
+                // Batsman 1
+                document.getElementById('batsman1Name').innerText = batsman1.name;
+                document.getElementById('batsman1Score').innerText = `${batsman1.runs} (${batsman1.balls} balls)`;
+                document.getElementById('batsman1Img').src = batsman1.imageURL || 'default-img.png';
+
+                // Batsman 2
+                document.getElementById('batsman2Name').innerText = batsman2.name;
+                document.getElementById('batsman2Score').innerText = `${batsman2.runs} (${batsman2.balls} balls)`;
+                document.getElementById('batsman2Img').src = batsman2.imageURL || 'default-img.png';
+
+                // Bowler
+                document.getElementById('bowlerName').innerText = bowler.name;
+                document.getElementById('bowlerStats').innerText = `${bowler.overs} overs, ${bowler.runs} runs, ${bowler.wickets} wickets`;
+                document.getElementById('bowlerImg').src = bowler.imageURL || 'default-img.png';
+
+                // Match info
+                document.getElementById('runRate').innerText = `Run Rate: ${matchData.runRate}`;
+                document.getElementById('requiredRunRate').innerText = `Required Run Rate: ${matchData.requiredRunRate}`;
+                document.getElementById('ballsLeft').innerText = `Balls Left: ${matchData.ballsLeft}`;
+                document.getElementById('runsNeeded').innerText = `Runs Needed: ${matchData.runsNeeded}`;
+
             } catch (error) {
-                console.error('Error fetching score:', error);
-                document.getElementById('scoreboard').innerText = 'Error fetching score';
+                console.error('Error fetching match data:', error);
+                document.getElementById('scoreboard').innerText = 'Error fetching data';
             }
         }
 
-        // Fetch score initially
-        fetchScore();
-
-        // Fetch score every 60 seconds
-        setInterval(fetchScore, 60000);
+        fetchMatchData();
+        setInterval(fetchMatchData, 60000); // Update every 60 seconds
     </script>
 </body>
 </html>
