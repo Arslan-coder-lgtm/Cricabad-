@@ -3,80 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Current Cricket Matches</title>
+    <title>Cricket Match Scores</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            color: #333;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #ff6f61, #d53f8c);
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
             padding: 20px;
+            text-align: center;
+        }
+        #content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: auto;
         }
         #matches {
             background: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            color: #333;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
         .match {
-            margin-bottom: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f9f9f9;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
         }
         .match h2 {
             margin: 0;
-            font-size: 1.2em;
+            font-size: 1.5em;
+            color: #333;
         }
         .match p {
             margin: 5px 0;
         }
+        footer {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
-    <h1>Current Cricket Matches</h1>
-    <div id="matches">Loading matches...</div>
+    <header>
+        <h1>Cricket Match Scores</h1>
+    </header>
+    <div id="content">
+        <div id="matches">Loading match details...</div>
+    </div>
+    <footer>
+        <p>© 2024 Cricket Scores</p>
+    </footer>
 
     <script>
-        // Define the API endpoint and headers
-        const apiUrl = 'https://cricbuzz-cricket.p.rapidapi.com/matches';
-        const apiKey = 'dee3026e2bmsh5c622c9e149f4d9p13c5fdjsn46fe8b4f157c'; // Your API key
+        const apiUrl = 'https://cricapi.com/api/match'; // Base URL for CricAPI
+        const apiKey = 'e02252ea-669b-4bef-bf77-6ff08c407fd6'; // Your CricAPI key
+        const matchId = 'e8046283-e660-4c85-92c4-77223c975e4f'; // Match ID
 
-        // Function to fetch current matches
-        async function fetchCurrentMatches() {
+        async function fetchMatchDetails() {
             try {
-                const response = await fetch(apiUrl, {
+                const response = await fetch(`${apiUrl}/${matchId}`, {
                     method: 'GET',
                     headers: {
-                        'x-rapidapi-host': 'cricbuzz-cricket.p.rapidapi.com',
-                        'x-rapidapi-key': apiKey
+                        'apikey': apiKey
                     }
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}, ${response.statusText}`);
+                    const errorDetails = await response.text();
+                    throw new Error(`HTTP error! Status: ${response.status}, ${response.statusText}. Details: ${errorDetails}`);
                 }
 
                 const data = await response.json();
-                console.log('Current Matches:', data); // For debugging
+                console.log('Match Details:', data); // For debugging
 
-                // Display the matches
+                // Display the match details
                 const matchesContainer = document.getElementById('matches');
-                if (data.matches && data.matches.length > 0) {
-                    matchesContainer.innerHTML = data.matches.map(match => `
+                if (data) {
+                    matchesContainer.innerHTML = `
                         <div class="match">
-                            <h2>${match.date}</h2>
-                            <p><strong>Teams:</strong> ${match.team1} vs ${match.team2}</p>
-                            <p><strong>Status:</strong> ${match.status}</p>
+                            <h2>Match Details</h2>
+                            <p><strong>Match ID:</strong> ${data.matchId || 'N/A'}</p>
+                            <p><strong>Teams:</strong> ${data.team1 || 'N/A'} vs ${data.team2 || 'N/A'}</p>
+                            <p><strong>Status:</strong> ${data.status || 'N/A'}</p>
+                            <p><strong>Score:</strong> ${data.score || 'N/A'}</p>
+                            <p><strong>Overs:</strong> ${data.overs || 'N/A'}</p>
                         </div>
-                    `).join('');
+                    `;
                 } else {
-                    matchesContainer.textContent = 'No current matches found.';
+                    matchesContainer.textContent = 'No match details found.';
                 }
             } catch (error) {
                 console.error('Fetch error:', error);
-                document.getElementById('matches').textContent = `Error fetching matches: ${error.message}`;
+                document.getElementById('matches').textContent = `Error fetching match details: ${error.message}`;
             }
         }
 
-        // Fetch current matches when the page loads
-        fetchCurrentMatches();
+        // Fetch match details when the page loads
+        fetchMatchDetails();
     </script>
 </body>
 </html>
