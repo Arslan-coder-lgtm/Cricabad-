@@ -1,65 +1,63 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Cricket Score</title>
+    <title>Cricket Data Fetch</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            padding: 20px;
+        }
+        #cricket-data {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            white-space: pre-wrap; /* To preserve formatting of JSON data */
+            overflow: auto;
+        }
+    </style>
 </head>
 <body>
-    <h1 id="live-score">Live Score: Loading...</h1>
-    <p id="batter-name">Current Batter: Loading...</p>
-    <p id="other-batter-name">Other Batter: Loading...</p>
-    <p id="current-score">Score: Loading...</p>
-    <p id="required-score">Required: Loading...</p>
-    <p id="run-rate">Run Rate: Loading...</p>
-    <p id="strike-rate">Strike Rate: Loading...</p>
-    <p id="last-6-balls">Last 6 Balls: Loading...</p>
+    <h1>Cricket Match Commentary</h1>
+    <div id="cricket-data">Loading data...</div>
 
     <script>
-        const apiKey = 'dee3026e2bmsh5c622c9e149f4d9p13c5fdjsn46fe8b4f157c';  // Your API key
-        const apiUrl = 'https://cricbuzz-cricbuzz.p.rapidapi.com/matches';  // Replace with the general Cricbuzz API endpoint
+        // Define the API endpoint and headers
+        const apiUrl = 'https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/41881/comm';
+        const apiKey = 'dee3026e2bmsh5c622c9e149f4d9p13c5fdjsn46fe8b4f157c'; // Your provided API key
 
-        async function fetchLiveScore() {
+        // Function to fetch and handle data
+        async function fetchCricketData() {
             try {
                 const response = await fetch(apiUrl, {
                     method: 'GET',
                     headers: {
-                        'x-rapidapi-host': 'cricbuzz-cricbuzz.p.rapidapi.com',  // Replace with the correct host if different
+                        'x-rapidapi-host': 'cricbuzz-cricket.p.rapidapi.com',
                         'x-rapidapi-key': apiKey
                     }
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    throw new Error(`Error: ${response.statusText}`);
                 }
 
                 const data = await response.json();
-
-                // Check if there's live match data available
-                const liveMatches = data.matches || [];
-                if (liveMatches.length > 0) {
-                    const match = liveMatches[0];  // Use the first match or adjust as needed
-
-                    // Update page content with API data
-                    document.getElementById('live-score').innerText = `Live Score: ${match.score || 'N/A'}`;
-                    document.getElementById('batter-name').innerText = `Current Batter: ${match.batsmen[0]?.name || 'Unknown'}`;
-                    document.getElementById('other-batter-name').innerText = `Other Batter: ${match.batsmen[1]?.name || 'Unknown'}`;
-                    document.getElementById('current-score').innerText = `Score: ${match.score || '0/0'}`;
-                    document.getElementById('required-score').innerText = `Required: ${match.requiredScore || '0'}`;
-                    document.getElementById('run-rate').innerText = `Run Rate: ${match.runRate || '0.0'}`;
-                    document.getElementById('strike-rate').innerText = `Strike Rate: ${match.strikeRate || '0.0'}`;
-                    document.getElementById('last-6-balls').innerText = `Last 6 Balls: ${match.last6Balls?.join(', ') || '0, 0, 0, 0, 0, 0'}`;
-                } else {
-                    document.getElementById('live-score').innerText = 'No live matches currently.';
-                }
+                console.log(data); // For debugging, log the data to the console
+                
+                // Display the data
+                document.getElementById('cricket-data').textContent = JSON.stringify(data, null, 2);
             } catch (error) {
-                console.error('Error fetching live score:', error);
-                document.getElementById('live-score').innerText = 'Error loading score.';
+                console.error('Fetch error:', error);
+                document.getElementById('cricket-data').textContent = 'Error fetching data';
             }
         }
 
-        fetchLiveScore();
-        setInterval(fetchLiveScore, 60000); // Refresh every minute
+        // Call the function to fetch data
+        fetchCricketData();
     </script>
 </body>
 </html>
