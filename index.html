@@ -29,7 +29,15 @@
         async function fetchScore() {
             try {
                 const response = await fetch(`https://cricapi.com/api/match?apikey=${apiKey}&id=${matchId}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const data = await response.json();
+                
+                // Log data for debugging
+                console.log('Fetched data:', data);
                 
                 // Update the DOM with the score
                 const scoreElement = document.getElementById('score');
