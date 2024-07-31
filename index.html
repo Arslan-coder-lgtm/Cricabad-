@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cricket Data Fetch</title>
+    <title>Current Cricket Matches</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,27 +11,35 @@
             color: #333;
             padding: 20px;
         }
-        #cricket-data {
+        #matches {
             background: #fff;
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            white-space: pre-wrap; /* To preserve formatting of JSON data */
-            overflow: auto;
+        }
+        .match {
+            margin-bottom: 10px;
+        }
+        .match h2 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+        .match p {
+            margin: 5px 0;
         }
     </style>
 </head>
 <body>
-    <h1>Cricket Match Commentary</h1>
-    <div id="cricket-data">Loading data...</div>
+    <h1>Current Cricket Matches</h1>
+    <div id="matches">Loading matches...</div>
 
     <script>
         // Define the API endpoint and headers
-        const apiUrl = 'https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/41881/comm';
-        const apiKey = 'dee3026e2bmsh5c622c9e149f4d9p13c5fdjsn46fe8b4f157c'; // Your provided API key
+        const apiUrl = 'https://cricbuzz-cricket.p.rapidapi.com/matches';
+        const apiKey = 'dee3026e2bmsh5c622c9e149f4d9p13c5fdjsn46fe8b4f157c'; // Your API key
 
-        // Function to fetch and handle data
-        async function fetchCricketData() {
+        // Function to fetch current matches
+        async function fetchCurrentMatches() {
             try {
                 const response = await fetch(apiUrl, {
                     method: 'GET',
@@ -46,18 +54,29 @@
                 }
 
                 const data = await response.json();
-                console.log(data); // For debugging, log the data to the console
-                
-                // Display the data
-                document.getElementById('cricket-data').textContent = JSON.stringify(data, null, 2);
+                console.log('Current Matches:', data); // For debugging
+
+                // Display the matches
+                const matchesContainer = document.getElementById('matches');
+                if (data.matches && data.matches.length > 0) {
+                    matchesContainer.innerHTML = data.matches.map(match => `
+                        <div class="match">
+                            <h2>${match.date}</h2>
+                            <p><strong>Teams:</strong> ${match.team1} vs ${match.team2}</p>
+                            <p><strong>Status:</strong> ${match.status}</p>
+                        </div>
+                    `).join('');
+                } else {
+                    matchesContainer.textContent = 'No current matches found.';
+                }
             } catch (error) {
                 console.error('Fetch error:', error);
-                document.getElementById('cricket-data').textContent = `Error fetching data: ${error.message}`;
+                document.getElementById('matches').textContent = `Error fetching matches: ${error.message}`;
             }
         }
 
-        // Call the function to fetch data
-        fetchCricketData();
+        // Fetch current matches when the page loads
+        fetchCurrentMatches();
     </script>
 </body>
 </html>
