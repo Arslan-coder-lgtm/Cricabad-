@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cricket Match Scores</title>
+    <title>Cricket Scorecard</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -23,26 +23,26 @@
             max-width: 1200px;
             margin: auto;
         }
-        #matches {
+        #scorecard {
             background: #fff;
             color: #333;
             border-radius: 10px;
             padding: 20px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
-        .match {
+        .scorecard {
             margin-bottom: 20px;
             padding: 15px;
             border-radius: 8px;
             background: #f9f9f9;
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
         }
-        .match h2 {
+        .scorecard h2 {
             margin: 0;
             font-size: 1.5em;
             color: #333;
         }
-        .match p {
+        .scorecard p {
             margin: 5px 0;
         }
         footer {
@@ -58,13 +58,13 @@
 </head>
 <body>
     <header>
-        <h1>Cricket Match Scores</h1>
+        <h1>Cricket Scorecard</h1>
     </header>
     <div id="content">
-        <div id="matches">Loading match details...</div>
+        <div id="scorecard">Loading scorecard details...</div>
     </div>
     <footer>
-        <p>© 2024 Cricket Scores</p>
+        <p>© 2024 Cricket Scorecard</p>
     </footer>
 
     <script>
@@ -72,7 +72,7 @@
         const apiKey = 'e02252ea-669b-4bef-bf77-6ff08c407fd6'; // Your CricAPI key
         const matchId = 'e8046283-e660-4c85-92c4-77223c975e4f'; // Match ID
 
-        async function fetchMatchDetails() {
+        async function fetchScorecard() {
             try {
                 const response = await fetch(`${apiUrl}/${matchId}`, {
                     method: 'GET',
@@ -87,32 +87,33 @@
                 }
 
                 const data = await response.json();
-                console.log('Match Details:', data); // For debugging
+                console.log('Scorecard Details:', data); // For debugging
 
-                // Display the match details
-                const matchesContainer = document.getElementById('matches');
+                // Display the scorecard details
+                const scorecardContainer = document.getElementById('scorecard');
                 if (data) {
-                    matchesContainer.innerHTML = `
-                        <div class="match">
-                            <h2>Match Details</h2>
+                    scorecardContainer.innerHTML = `
+                        <div class="scorecard">
+                            <h2>Match Scorecard</h2>
                             <p><strong>Match ID:</strong> ${data.matchId || 'N/A'}</p>
                             <p><strong>Teams:</strong> ${data.team1 || 'N/A'} vs ${data.team2 || 'N/A'}</p>
                             <p><strong>Status:</strong> ${data.status || 'N/A'}</p>
                             <p><strong>Score:</strong> ${data.score || 'N/A'}</p>
                             <p><strong>Overs:</strong> ${data.overs || 'N/A'}</p>
+                            <p><strong>Last Update:</strong> ${data.lastUpdate || 'N/A'}</p>
                         </div>
                     `;
                 } else {
-                    matchesContainer.textContent = 'No match details found.';
+                    scorecardContainer.textContent = 'No scorecard details found.';
                 }
             } catch (error) {
                 console.error('Fetch error:', error);
-                document.getElementById('matches').textContent = `Error fetching match details: ${error.message}`;
+                document.getElementById('scorecard').textContent = `Error fetching scorecard details: ${error.message}`;
             }
         }
 
-        // Fetch match details when the page loads
-        fetchMatchDetails();
+        // Fetch scorecard details when the page loads
+        fetchScorecard();
     </script>
 </body>
 </html>
